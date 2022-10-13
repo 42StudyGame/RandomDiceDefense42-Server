@@ -5,11 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
+    <PackageReference Include="MySqlConnector" Version="2.1.13" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="BooksController\" />
     <Folder Include="BookStoreDatabaseSettings\" />
   </ItemGroup>
 

@@ -1,5 +1,4 @@
-﻿using RandomDice_Login.Services;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MySqlConnector;
 
 namespace RandomDice_Login
 {
@@ -42,10 +42,11 @@ namespace RandomDice_Login
             //services.AddSingleton<BookService>();
 
             // TODO: 서비스 등록.
-            string connString = Configuration.GetConnectionString("DefaultConnection");
-            services.Add(new ServiceDescriptor(typeof(BookService_Maira), new BookService_Maira(
-                    connString
-                )));
+            //string connString = Configuration.GetConnectionString("DefaultConnection");
+            //services.Add(new ServiceDescriptor(typeof(BookService_Maira), new BookService_Maira(
+            //        connString
+            //    )));
+            services.AddTransient<MySqlConnection>(_ => new MySqlConnection(Configuration["ConnectionStrings:Default"]));
             services.AddControllers();
         }
 
