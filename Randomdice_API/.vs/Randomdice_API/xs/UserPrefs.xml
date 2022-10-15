@@ -1,0 +1,40 @@
+﻿<Properties StartupConfiguration="{9A322F74-304E-47E4-8491-258585C451FD}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Randomdice_API/Models/UserModel.cs">
+    <Files>
+      <File FileName="Randomdice_API/Program.cs" Line="9" Column="133" />
+      <File FileName="Randomdice_API/appsettings.json" Line="10" Column="4" />
+      <File FileName="Randomdice_API/Properties/launchSettings.json" Line="30" Column="4" />
+      <File FileName="Randomdice_API/Controllers/WeatherForecastController.cs" Line="15" Column="1" />
+      <File FileName="Randomdice_API/Models/UserModel.cs" Line="133" Column="2" />
+      <File FileName="Randomdice_API/Controllers/LoginController.cs" Line="1" Column="1" />
+      <File FileName="Randomdice_API/WeatherForecast.cs" Line="1" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Randomdice_API" expanded="True" selected="True">
+            <Node name="Randomdice_API" expanded="True">
+              <Node name="Dependencies" expanded="True">
+                <Node name="FrameworkReferences" expanded="True" />
+                <Node name="PackageDependencies" expanded="True" />
+              </Node>
+              <Node name="Controllers" expanded="True" />
+              <Node name="Models" expanded="True" />
+              <Node name="Properties" expanded="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.Randomdice__API PreferredExecutionTarget="/Applications/Safari.app" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+</Properties>
