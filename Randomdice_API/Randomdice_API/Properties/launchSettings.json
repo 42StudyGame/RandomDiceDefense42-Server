@@ -16,7 +16,7 @@
       "applicationUrl": "https://localhost:7264;http://localhost:5159",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "CONNECTION_STRING": "server=127.0.0.1;port=3306;database=randomdice;user=root;password=kimchI#jinju:127m"
+        "CONNECTION_STRING": "server=127.0.0.1;port=3306;database=randomdice;user=root;password="
       }
     },
     "IIS Express": {
