@@ -36,7 +36,7 @@ namespace RandomDice_Login.Models
 
         MySqlConnection connectionFactory()
         {
-            string ConnString = "server=localhost;port=3306;database=RD_LoginTest;user=root;password=";
+            string? ConnString = System.Environment.GetEnvironmentVariable("CONNECTION_STRING");
             var connection = new MySqlConnection(ConnString);
             connection.Open();
             return connection;
@@ -100,7 +100,7 @@ namespace RandomDice_Login.Models
 
         MySqlConnection connectionFactory()
         {
-            string ConnString = "server=localhost;port=3306;database=RD_LoginTest;user=root;password=";
+            string? ConnString = System.Environment.GetEnvironmentVariable("CONNECTION_STRING");
             var connection = new MySqlConnection(ConnString);
             connection.Open();
             return connection;
