@@ -1,12 +1,17 @@
-﻿using MySqlConnector;
-
+﻿using Microsoft.EntityFrameworkCore;
+using Randomdice_API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<UserContext>(options =>
+    options.UseSqlServer(connectionString));
 builder.Services.AddControllers();
-builder.Services.AddTransient<MySqlConnection>(_ => new MySqlConnection(System.Environment.GetEnvironmentVariable("CONNECTION_STRING")));
+
+// TODO:
+
 
 var app = builder.Build();
 
