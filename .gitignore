@@ -78,4 +78,4 @@ _[Ss]cripts
 .VS
 .vs
 .vs/
-*.vs
+*.vs*
