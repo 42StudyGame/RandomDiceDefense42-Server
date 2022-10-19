@@ -77,4 +77,4 @@ _[Ss]cripts
 ## user
 .VS
 .vs
-*.vs*
+.vs/
