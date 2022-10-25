@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -17,5 +17,6 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="MySqlConnector" Version="2.1.13" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.70" />
   </ItemGroup>
 </Project>
