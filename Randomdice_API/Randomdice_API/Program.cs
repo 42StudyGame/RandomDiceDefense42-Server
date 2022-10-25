@@ -1,5 +1,6 @@
 ﻿using MySqlConnector;
 using Randomdice_API;
+using Randomdice_API.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,8 @@ builder.Services.AddTransient<MySqlConnection>(_ => new MySqlConnection(
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 builder.Services.AddTransient<UserService>();
+builder.Services.AddTransient<BlockingCollectionQueueServiec<string>>();
+builder.Services.AddHostedService<RedisService>();
 
 var app = builder.Build();
 
