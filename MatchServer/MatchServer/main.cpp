@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <winsock2.h>
 //#include "ITcpNetwork.h"
 #include "hiredis.h"
 #include "Redis.h"

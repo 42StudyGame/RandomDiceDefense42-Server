@@ -1,5 +1,6 @@
 ﻿using StackExchange.Redis;
 using System.Threading.Channels;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Randomdice_API.Service
 {
@@ -7,17 +8,14 @@ namespace Randomdice_API.Service
     {
         BlockingCollectionQueueServiec<string> _queue;
         private readonly ILogger<RedisService> _logger;
-        private readonly string _redisConnectionString;
+        private readonly string _redisConnectionString = "127.0.0.1:6379";
         private readonly ConnectionMultiplexer _connection;
-        private readonly string _channel;
+        private readonly string _channel = "test-channel";
 
-        public RedisService(BlockingCollectionQueueServiec<string> queue, 
-            ILogger<RedisService> logger, string redisConnectionString, string channel)
+        public RedisService(BlockingCollectionQueueServiec<string> queue, ILogger<RedisService> logger)
         {
             _queue = queue;
             _logger = logger;
-            _redisConnectionString = redisConnectionString;
-            _channel = channel;
             _connection = ConnectionMultiplexer.Connect(_redisConnectionString);
         }
 
