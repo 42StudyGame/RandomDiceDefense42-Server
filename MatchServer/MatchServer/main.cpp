@@ -2,7 +2,7 @@
 #include <winsock2.h>
 //#include "ITcpNetwork.h"
 #include "hiredis.h"
-#include "Redis.h"
+#include "RedisManager.h"
 
 #define IP "127.0.0.1"
 #define PORT 6379
@@ -20,12 +20,12 @@ int main(int argc, char** argv)
 		}
 	}
 
-	std::unique_ptr<Redis> redis = std::make_unique<Redis>(isunix, IP, PORT, CHANNEL);
+	std::unique_ptr<RedisManager> redis = std::make_unique<RedisManager>(isunix, IP, PORT);
 	redis->RedisInit();
-	for (int i = 0; i < 10; i++)
-	{
-		redis->Publish("hi");
-		Sleep(2000);
+	while (1)
+	{		
+		redis->getUsersTask();
+		Sleep(1000);
 	}
 	
 	return 0;
