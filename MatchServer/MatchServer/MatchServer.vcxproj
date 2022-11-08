@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ReferencePath>$(SolutionDir)Libraries\redis-3.0\Debug;$(ReferencePath)</ReferencePath>
+    <ReferencePath>$(SolutionDir)OtherSrcs\rapidjson;$(SolutionDir)Libraries\redis-3.0\Debug;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -107,7 +107,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Libraries\redis-3.0\Debug;$(ReferencePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)OtherSrcs\rapidjson;$(SolutionDir)Libraries\redis-3.0\Debug;$(ReferencePath)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -135,10 +135,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Redis.cpp" />
+    <ClCompile Include="MatchedUsers.cpp" />
+    <ClCompile Include="RedisManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Redis.h" />
+    <ClInclude Include="MatchedUsers.h" />
+    <ClInclude Include="RedisManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
