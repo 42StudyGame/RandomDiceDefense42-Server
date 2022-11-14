@@ -17,7 +17,7 @@
     <ClCompile Include="RedisManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="MatchedUsers.cpp">
+    <ClCompile Include="MatchedInfo.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -25,7 +25,7 @@
     <ClInclude Include="RedisManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="MatchedUsers.h">
+    <ClInclude Include="MatchedInfo.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

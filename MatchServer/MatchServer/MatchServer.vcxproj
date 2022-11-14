@@ -135,11 +135,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MatchedUsers.cpp" />
+    <ClCompile Include="MatchedInfo.cpp" />
     <ClCompile Include="RedisManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MatchedUsers.h" />
+    <ClInclude Include="MatchedInfo.h" />
     <ClInclude Include="RedisManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
