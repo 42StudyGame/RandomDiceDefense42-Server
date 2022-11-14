@@ -1,5 +1,5 @@
 ﻿#include "RedisManager.h"
-#include "MatchedUsers.h"
+#include "MatchedInfo.h"
 #ifdef _MSC_VER
 	#include <winsock2.h>
 #endif
@@ -44,7 +44,7 @@ bool RedisManager::RedisInit()
 bool RedisManager::matching(std::string rank)
 {
 	int i = 0;
-	redisReply* reply[3];
+	redisReply* reply[4];
 	std::string watch = "WATCH " + rank;
 	std::string llen = "LLEN " + rank;
 	std::string lrange = "LRANGE " + rank + " 0 1";
@@ -63,12 +63,13 @@ bool RedisManager::matching(std::string rank)
 			freeReplyObject(reply[i]);
 			break;
 		}
-		MatchedUsers matched(std::string(reply[i]->element[0]->str), std::string(reply[i]->element[1]->str)
-			, std::string("127.0.0.1"), std::string(reply[i]->element[0]->str));
-		std::string json = matched.makeJson();
-		std::string jsonCmd = "RPUSH matched " + json;
+		MatchedInfo matched(std::string("127.0.0.1"), std::string("8181"));
+		std::string json = matched.geteJsonString();
+		std::string jsonCmd1 = "HSET matched " + std::string(reply[0]->element[0]->str) + " " + json;
+		std::string jsonCmd2 = "HSET matched " + std::string(reply[0]->element[1]->str) + " " + json;
 		redisCommand(m_c, "MULTI");
-		reply[++i] = (redisReply*)redisCommand(m_c, jsonCmd.c_str()); // i = 2
+		reply[++i] = (redisReply*)redisCommand(m_c, jsonCmd1.c_str());
+		reply[++i] = (redisReply*)redisCommand(m_c, jsonCmd2.c_str()); // i = 2
 		reply[++i] = (redisReply*)redisCommand(m_c, ltrim.c_str()); // i = 3 이 상태로 빠져나옴
 		redisCommand(m_c, "EXEC");
 		redisCommand(m_c, "UNWATCH");

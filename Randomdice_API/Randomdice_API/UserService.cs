@@ -7,7 +7,6 @@ namespace Randomdice_API
 {
     public class UserService
     {
-
         private MySqlConnection m_conn;
 
         public UserService(MySqlConnection mySqlConnector)
@@ -22,25 +21,28 @@ namespace Randomdice_API
             using (m_conn)
             {
                 m_conn.Open();
-                return m_conn.Execute(SQL, user);
+                m_conn.Execute(SQL, user);
+                m_conn.Close();
+                return 0;//FIXME:
             }
         }
 
         public bool Login(User user)
         {
-            string SQL = "SELECT * FROM t_user WHERE email = @email;";
+            string SQL = "SELECT * FROM t_user WHERE email = @uid;";
             using (m_conn)
             {
                 m_conn.Open();
-                var userInfoInDb = m_conn.QuerySingleOrDefault<User>(SQL, user.Email);
-                if (!IsSamePassword(userInfoInDb.Password, user.Password)) //QuerySingleAsync로 하면 왜 이게 안될까?
+                var userInfoInDb = m_conn.QuerySingleOrDefault<User>(SQL, user.id);
+                if (!IsSamePassword(userInfoInDb.password, user.password)) //QuerySingleAsync로 하면 왜 이게 안될까?
                 {
+                    m_conn.CloseAsync();
                     throw new Exception("비밀번호가 틀렸습니다");
                 }
+                m_conn.CloseAsync();
                 return true;
             }
         }
-
 
         private bool IsSamePassword(string loginPassword, string dbPassword)
         {
@@ -49,6 +51,20 @@ namespace Randomdice_API
                 return true;
             }
             return false;
+        }
+
+        // 해당 정보는 인증이 완료된 유저가 요청했을 때만 호출 되게...?
+        public User getUserInfo(string id)
+        {
+            string SQL = "SELECT * FROM t_user WHERE id = \"" + id + "\";";
+            var dictionary = new Dictionary<string, object>
+            {
+                { "@id", id }
+            };
+            m_conn.Open();
+            var userInfoInDb = m_conn.QuerySingleOrDefault<User>(SQL, dictionary);
+            m_conn.Close();
+            return userInfoInDb;
         }
     }
 }
