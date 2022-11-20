@@ -17,7 +17,7 @@ namespace Randomdice_API
         // TODO : 중복된 회원은 가입되지 않게.
         public int Register(User user)
         {
-            string SQL = "INSERT INTO t_user(user_name, email, password) SELECT @user_name, @Email, @Password;";
+            string SQL = "INSERT INTO t_user(id, email, passwordHash, passwordSalt) SELECT @id, @email, @passwordHash, @passwordSalt;";
             using (m_conn)
             {
                 m_conn.Open();
@@ -27,20 +27,41 @@ namespace Randomdice_API
             }
         }
 
-        public bool Login(User user)
+        // TODO: AUTH써야 하므로, 비밀번호 확인하는 코드는 컨트롤러로 빼기
+        // 함수 변경. Login ->  getHashAndSalt 
+        //public bool Login(InputLoginUser user)
+        //{
+        //    string SQL = "SELECT * FROM t_user WHERE id = @id;";
+        //    using (m_conn)
+        //    {
+        //        m_conn.Open();
+        //        var userInfoInDb = m_conn.QuerySingleOrDefault<User>(SQL, user.id);
+        //        if (!IsSamePassword(userInfoInDb.password, user.password)) //QuerySingleAsync로 하면 왜 이게 안될까?
+        //        {
+        //            m_conn.CloseAsync();
+        //            throw new Exception("비밀번호가 틀렸습니다");
+        //        }
+        //        m_conn.CloseAsync();
+        //        return true;
+        //    }
+        //}
+
+        public void getUserHashAndSalt(string id, out byte[]? passwordHash, out byte[]? passwordSalt)
         {
-            string SQL = "SELECT * FROM t_user WHERE email = @uid;";
+            string SQL = "SELECT * FROM t_user WHERE id = @id;";
             using (m_conn)
             {
                 m_conn.Open();
-                var userInfoInDb = m_conn.QuerySingleOrDefault<User>(SQL, user.id);
-                if (!IsSamePassword(userInfoInDb.password, user.password)) //QuerySingleAsync로 하면 왜 이게 안될까?
+                var userInfoInDb = m_conn.QuerySingleOrDefault<User>(SQL, id);
+                if (userInfoInDb == null)
                 {
-                    m_conn.CloseAsync();
-                    throw new Exception("비밀번호가 틀렸습니다");
+                    passwordHash = null;
+                    passwordSalt = null;
+                    return;
                 }
+                passwordHash = userInfoInDb.passwordHash;
+                passwordSalt = userInfoInDb.passwordSalt;
                 m_conn.CloseAsync();
-                return true;
             }
         }
 
