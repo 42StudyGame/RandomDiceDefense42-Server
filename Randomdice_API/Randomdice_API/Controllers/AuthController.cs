@@ -6,6 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using Microsoft.Extensions.Configuration;
+using System.Security.Claims;
+using Randomdice_API.Configurations;
+//using Microsoft.Identity.Client;
 
 namespace RandomDice_Login.LoginController
 {
@@ -13,6 +17,7 @@ namespace RandomDice_Login.LoginController
     public class AuthController : ControllerBase
     {
         private UserService m_userService;
+        private readonly JwtConfig m_jwtConfig;
 
         public AuthController(UserService service)
         {
@@ -21,21 +26,24 @@ namespace RandomDice_Login.LoginController
 
         [HttpPost]
         [Route("login")]
-        public async Task<ActionResult<User>> LoginProc([FromBody] InputLoginUser login)
+        public async Task<ActionResult<User>> LoginProc([FromBody] InputLoginUser user)
         {
             // DB에 ID가 있는지 확인
             // 없으면 Badrequest()
             // 있으면, 해당 ID의 유저 데이터를 가지고 와서 비밀번호 비교.
-            m_userService.getUserHashAndSalt(login.id, out byte[]? passwordHash, out byte[]? passwordSalt);
+            m_userService.getUserHashAndSalt(user.id, out byte[]? passwordHash, out byte[]? passwordSalt);
             if (passwordHash == null || passwordSalt == null)
             {
                 return BadRequest("wrong Id.");
             }
-            if (VerifyPsswordHash(login.password, passwordHash, passwordSalt) == false)
+            if (VerifyPsswordHash(user.password, passwordHash, passwordSalt) == false)
             {
                 return BadRequest("wrong password.");
             }
-            return Ok("login success.");
+            //return Ok("login success.");
+
+
+            return Ok("success without Token");
         }
 
         // password : 요청 받은 비밀번호
@@ -71,10 +79,17 @@ namespace RandomDice_Login.LoginController
             {
                 return new JsonResult(e.ToString());
             }
+            // AuthenticationResult : Microsoft.Identity.Client 설치
+            //return BadRequest(new AuthenticationResult()
+            //{
+
+            //}
+            //    );
             //ControllerBase를 상속해야 OK사용 가능.
             return Ok(user);
         }
 
+       
         //DB에 저장할 해시화 된 비밀번호와, salt값을 만들어주는 함수.
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
@@ -84,6 +99,15 @@ namespace RandomDice_Login.LoginController
                 passwordSalt = hmac.Key; // 솔트 생성
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password)); // password 해싱.
                 // 솔트값을 조작해서 password에 붙여서 한 번 더 꼬아주는게 더 좋지 않나? -> salting함수 만들어서 비밀번호 한번 더 가공.
+            }
+        }
+
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
             }
         }
     }
