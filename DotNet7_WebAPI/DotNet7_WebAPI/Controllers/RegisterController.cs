@@ -11,12 +11,10 @@ namespace DotNet7_WebAPI.Controllers
     [ApiController]
     public class RegisterController : ControllerBase
     {
-        //MySqlConnection _conn;
         MysqlService _RDB;
-        public RegisterController(MysqlService msysql)
+        public RegisterController(MysqlService mysql)
         {
-            //_conn = conn;
-            _RDB= msysql;
+            _RDB = mysql;
         }
 
         [HttpPost]
@@ -25,25 +23,14 @@ namespace DotNet7_WebAPI.Controllers
             // 아이디 조건 확인
             string salt = Security.GetSalt();
             string HashPassword = Security.MakeHashingPassWord(salt, value.Password);
-            using (RegisterDBModel RDBUser = new RegisterDBModel())
+            using (AccountDBModel RDBUser = new AccountDBModel())
             {
                 RDBUser.Salt = salt;
                 RDBUser.HashedPassword = HashPassword;
                 RDBUser.ID = value.ID;
+                RDBUser.UserRank = "bronze";
                 _RDB.RegisterUser(RDBUser);
             }
-        }
-
-        // PUT api/<RegisterController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<RegisterController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

@@ -1,5 +1,8 @@
+using DotNet7_WebAPI.Model;
 using DotNet7_WebAPI.Service;
+using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
+using static Pipelines.Sockets.Unofficial.Threading.MutexSlim;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,10 +12,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<MySqlConnection>(_ => new MySqlConnection(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    ));
+builder.Services.Configure<DbConfig>(builder.Configuration.GetSection("DbConfig")); // Todo
 builder.Services.AddTransient<MysqlService>();
+builder.Services.AddSingleton<RedisService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -1,5 +1,6 @@
 ﻿using DotNet7_WebAPI.Model;
 using MessagePack;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace DotNet7_WebAPI.Service
@@ -10,9 +11,9 @@ namespace DotNet7_WebAPI.Service
 
 
         ConnectionMultiplexer redis;
-        public RedisService(string IPPort)
+        public RedisService(IOptions<DbConfig> dbconfig)
         {
-            redis = ConnectionMultiplexer.Connect(IPPort);
+            redis = ConnectionMultiplexer.Connect(dbconfig.Value.ActiveUserDb);
         }
 
         public IDatabase getRedisDB()
@@ -22,11 +23,11 @@ namespace DotNet7_WebAPI.Service
 
     }
 
-    public static class RedisAuthService
+    public static class RedisActiveUserService
     {
-        public static void setToken(IDatabase db, string ID, string Token)
+        public static void setActiveUser(IDatabase db, string ID, string userInfo)
         {
-            db.StringSet(ID, Token);
+            db.StringSet(ID, userInfo);
         }
         public static string? GetToken(IDatabase db, string ID)
         {
@@ -42,7 +43,5 @@ namespace DotNet7_WebAPI.Service
             db.StringSet(ID, Password);
             return 1;
         }
-
-    
     }
 }

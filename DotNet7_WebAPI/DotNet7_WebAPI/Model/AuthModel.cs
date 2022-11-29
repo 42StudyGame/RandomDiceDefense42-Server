@@ -10,16 +10,21 @@
         public string ID { set; get; }
         public string Password { set; get; }
     }
-    public class RegisterDBModel : IDisposable
-    { 
+    public class LoginInputModel
+    {
         public string ID { set; get; }
-        public string HashedPassword { set; get; }
-        public string Salt { set; get; }
+        public string Password { set; get; }
+    }
+
+    public class ActiveUserModel : IDisposable
+    {
+        public string ID { set; get; }
+        public string UserRank { set; get; }
+        public string Token { set; get; }
 
         public void Dispose()
         {
             ;
         }
     }
-
 }
