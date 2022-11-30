@@ -25,7 +25,7 @@ namespace DotNet7_WebAPI.Controllers
         {
             // DB에서 유저의 정보를 가져옴. 없는 유저라면 null을?
             RtAcountDb rt = _accountDb.GetUser(login.ID);
-            if (rt.isError)
+            if (rt.isError == true)
             {
                 return BadRequest(rt.excecptionString);
             }
@@ -42,7 +42,7 @@ namespace DotNet7_WebAPI.Controllers
                 activeUser.UserRank = rt.data.UserRank;
                 string jsonAccount = JsonSerializer.Serialize(activeUser);
                 // 모델은 redis에 저장. -> json형태로 변경.
-                RedisActiveUserService.setActiveUser(_activeUserDb.getRedisDB(), login.ID, jsonAccount);
+                RedisActiveUserService.SetActiveUserInfo(_activeUserDb.getRedisDB(), login.ID, jsonAccount);
                 // 토큰 클라에게 전달
                 return Ok(activeUser.Token);
             }

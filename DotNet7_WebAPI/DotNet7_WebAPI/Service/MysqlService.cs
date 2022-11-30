@@ -22,7 +22,7 @@ namespace DotNet7_WebAPI.Service
 
         public void RegisterUser(AccountDBModel User)
         {
-            string SQL = "INSERT INTO t_user(id, hashedPassword, salt, userRank) VALUES (@ID, @HashedPassword, @Salt, @Rank);";
+            string SQL = "INSERT INTO t_user(id, hashedPassword, salt, userRank) VALUES (@ID, @HashedPassword, @Salt, @UserRank);";
             using (_conn)
             {
                 _conn.Open();
@@ -34,7 +34,7 @@ namespace DotNet7_WebAPI.Service
         public RtAcountDb GetUser(string id)
         {
             RtAcountDb rt = new RtAcountDb();
-            rt.isError= false;
+            rt.isError = false;
             var parameters = new {ID = id};
             string SQL = "SELECT * FROM t_user WHERE id=@ID";
             using (_conn)
@@ -43,6 +43,12 @@ namespace DotNet7_WebAPI.Service
                 try
                 {
                     AccountDBModel sqlResult = _conn.QuerySingleOrDefault<AccountDBModel>(SQL, parameters);
+                    if (sqlResult == null)
+                    {
+                        rt.isError = true;
+                        rt.excecptionString = "no such user";
+                        return rt;
+                    }
                     rt.data = sqlResult;
                 }
                 catch (Exception ex)

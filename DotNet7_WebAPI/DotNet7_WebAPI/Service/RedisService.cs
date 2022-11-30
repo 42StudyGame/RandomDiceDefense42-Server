@@ -25,11 +25,11 @@ namespace DotNet7_WebAPI.Service
 
     public static class RedisActiveUserService
     {
-        public static void setActiveUser(IDatabase db, string ID, string userInfo)
+        public static void SetActiveUserInfo(IDatabase db, string ID, string userInfo)
         {
             db.StringSet(ID, userInfo);
         }
-        public static string? GetToken(IDatabase db, string ID)
+        public static string? GetActiveUserInfo(IDatabase db, string ID)
         {
             return db.StringGet(ID);
         }

@@ -1,4 +1,4 @@
-using DotNet7_WebAPI.Model;
+﻿using DotNet7_WebAPI.Model;
 using DotNet7_WebAPI.Service;
 using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
@@ -24,6 +24,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<DotNet7_WebAPI.Middleware.AuthCheckMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
