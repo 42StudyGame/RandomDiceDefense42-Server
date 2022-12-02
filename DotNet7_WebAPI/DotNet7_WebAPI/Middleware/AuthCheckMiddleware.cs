@@ -29,6 +29,8 @@ namespace DotNet7_WebAPI.Middleware
 
                 return;
             }
+            // 아래의 context.Request.Body.Position= 0;하기 위해서 필요.
+            context.Request.EnableBuffering();
             // 토큰 검색
             // http의 원시 바디는 한번 만 접근 할 수 있으므로, 스트림에 담아놓고 여러번 읽을 수 있게 함.
             using (var reader = new System.IO.StreamReader(context.Request.Body, System.Text.Encoding.UTF8, true, 4096, true))
@@ -50,15 +52,11 @@ namespace DotNet7_WebAPI.Middleware
                 {
                     return;
                 }
-                // 읽은 내용을 다시 bosy에 담아놔야 한다.??
-                //var bytes = Encoding.UTF8.GetBytes(inputBody);
-                //await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
-                AuthModel tempUserInfo = new AuthModel();
-                tempUserInfo.ID = id;
-                tempUserInfo.Token = token;
-                context.Items[nameof(AuthModel)] = tempUserInfo;
+                // need to enable buffering.
+                // 이걸 해줘야 아래의 await _next(context);도 성공함.
+                context.Request.Body.Position= 0;
             }
-            context.Response.Body.Position= 0;
+            //context.Response.Body.Position= 0;
             //context.Request.Body.Position = 0;   
             // 문제 없으면 다음 delegate/middleware로 context를 넘김
             // 근데.. 뭐 성공해도 뭐 전치리 해서 담아서 옮겨야 하나?
