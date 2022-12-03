@@ -39,7 +39,7 @@ namespace DotNet7_WebAPI.Controllers
                 // Token생성해서
                 activeUser.Token = Security.CreateAuthToken();
                 activeUser.ID = login.ID;
-                activeUser.UserRank = rt.data.UserRank;
+                //activeUser.UserRank = rt.data.UserRank;
                 string jsonAccount = JsonSerializer.Serialize(activeUser);
                 // 모델은 redis에 저장. -> json형태로 변경.
                 RedisActiveUserService.SetActiveUserInfo(_activeUserDb.getRedisDB(), login.ID, jsonAccount);

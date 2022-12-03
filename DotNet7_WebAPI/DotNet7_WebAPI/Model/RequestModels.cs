@@ -19,12 +19,16 @@
     public class ActiveUserModel : IDisposable
     {
         public string ID { set; get; }
-        public string UserRank { set; get; }
+        //public string UserRank { set; get; }
         public string Token { set; get; }
 
         public void Dispose()
         {
             ;
         }
+    }
+    public class ScenarioRequestModel : AuthModel
+    {
+        public UInt16 RqusetState;
     }
 }

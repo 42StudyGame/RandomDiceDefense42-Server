@@ -2,6 +2,10 @@
 {
     public class RtCommon
     {
+        RtCommon()
+        {
+            isError= false;
+        }
         public bool isError { get; set; }
         public string excecptionString { get; set; }
     }

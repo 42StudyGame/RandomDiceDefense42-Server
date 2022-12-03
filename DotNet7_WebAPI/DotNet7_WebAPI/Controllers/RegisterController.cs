@@ -28,7 +28,9 @@ namespace DotNet7_WebAPI.Controllers
                 RDBUser.Salt = salt;
                 RDBUser.HashedPassword = HashPassword;
                 RDBUser.ID = value.ID;
-                RDBUser.UserRank = "bronze";
+                RDBUser.HighestStage = 0;
+                RDBUser.HighestScore = 0;
+                //RDBUser.UserRank = "bronze";
                 _RDB.RegisterUser(RDBUser);
             }
         }

@@ -20,17 +20,29 @@ namespace DotNet7_WebAPI.Service
             _conn = new MySqlConnection(_connectionString);
         }
 
-        public void RegisterUser(AccountDBModel User)
+        public RtAcountDb RegisterUser(AccountDBModel User)
         {
-            string SQL = "INSERT INTO t_user(id, hashedPassword, salt, userRank) VALUES (@ID, @HashedPassword, @Salt, @UserRank);";
+            RtAcountDb rt = new RtAcountDb();
+            string SQL = "INSERT INTO t_user(id, hashedPassword, salt, highestStage, highestScore) " +
+                "VALUES (@ID, @HashedPassword, @Salt, @HighestStage, @HighestScore);";
             using (_conn)
             {
-                _conn.Open();
-                _conn.Execute(SQL, User);
-                _conn.Close();
+                try
+                {
+                    _conn.Open();
+                    _conn.Execute(SQL, User);
+                    _conn.Close();
+                }
+                catch(Exception ex)
+                {
+                    rt.isError = true;
+                    rt.excecptionString = ex.Message;
+                }
             }
+            return rt;
         }
 
+        // 여기 있는 함수들은 예외를 던지게 설계하는게 좋을듯.
         public RtAcountDb GetUser(string id)
         {
             RtAcountDb rt = new RtAcountDb();
