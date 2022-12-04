@@ -7,9 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="NewFolder\**" />
+    <Content Remove="NewFolder\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
+    <None Remove="NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\Scenarios\UseStaticFiles.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Scenarios\UseStaticFiles.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="MessagePack" Version="2.4.59" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="MySqlConnector" Version="2.1.13" />
     <PackageReference Include="SqlKata" Version="2.4.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.6.80" />

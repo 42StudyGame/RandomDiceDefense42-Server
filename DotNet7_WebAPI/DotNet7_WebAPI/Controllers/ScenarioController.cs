@@ -8,11 +8,11 @@ namespace DotNet7_WebAPI.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class ScenarioController : ControllerBase
+    public class ScenarioXXXXController : ControllerBase
     {
         MysqlService _accoutDb;
 
-        public ScenarioController(MysqlService accoutDb)
+        public ScenarioXXXXController(MysqlService accoutDb)
         {
             _accoutDb = accoutDb;
         }
@@ -21,6 +21,7 @@ namespace DotNet7_WebAPI.Controllers
         public IActionResult Post([FromBody] ScenarioRequestModel value)
         {
             // 일단 유저의 정보를 가져와야 한다.
+            // 일단 여기가지 왔으면 유저 아이디는 맞다고 봐야하나?
             RtAcountDb rtUserInfo = _accoutDb.GetUser(value.ID);
             if (rtUserInfo.isError)
                 return BadRequest(rtUserInfo.excecptionString);

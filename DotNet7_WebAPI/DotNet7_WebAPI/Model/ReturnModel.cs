@@ -2,12 +2,12 @@
 {
     public class RtCommon
     {
-        RtCommon()
+        public RtCommon()
         {
             isError= false;
         }
         public bool isError { get; set; }
-        public string excecptionString { get; set; }
+        public string? excecptionString { get; set; }
     }
 
     public class RtAcountDb : RtCommon

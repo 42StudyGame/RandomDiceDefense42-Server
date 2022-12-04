@@ -1,6 +1,8 @@
 ﻿using DotNet7_WebAPI.Model;
 using DotNet7_WebAPI.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
+using System.Net.Http;
 using System.Text.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -32,20 +34,25 @@ namespace DotNet7_WebAPI.Controllers
             //비밀번호 확인
             if (Security.MakeHashingPassWord(rt.data.Salt, login.Password) != rt.data.HashedPassword)
             {
-                return BadRequest("Worng Password");
+                return BadRequest("Wrong Password");
             }
-            using (ActiveUserModel activeUser = new ActiveUserModel())
-            {
-                // Token생성해서
-                activeUser.Token = Security.CreateAuthToken();
-                activeUser.ID = login.ID;
-                //activeUser.UserRank = rt.data.UserRank;
-                string jsonAccount = JsonSerializer.Serialize(activeUser);
-                // 모델은 redis에 저장. -> json형태로 변경.
-                RedisActiveUserService.SetActiveUserInfo(_activeUserDb.getRedisDB(), login.ID, jsonAccount);
-                // 토큰 클라에게 전달
-                return Ok(activeUser.Token);
-            }
+            string token = Security.CreateAuthToken();
+            // 필요시 token이외에 다른 정보도 합쳐서 저장
+            RedisActiveUserService.SetActiveUserInfo(_activeUserDb.getRedisDB(), login.ID, token);
+            Response.Headers.Add("Token", token);
+            return Ok();
+            //using (ActiveUserModel activeUser = new ActiveUserModel())
+            //{
+            //    // Token생성해서
+            //    activeUser.Token = Security.CreateAuthToken();
+            //    activeUser.ID = login.ID;
+            //    //activeUser.UserRank = rt.data.UserRank;
+            //    string jsonAccount = JsonSerializer.Serialize(activeUser);
+            //    // 모델은 redis에 저장. -> json형태로 변경.
+            //    RedisActiveUserService.SetActiveUserInfo(_activeUserDb.getRedisDB(), login.ID, jsonAccount);
+            //    // 토큰 클라에게 전달
+            //    return Ok(activeUser.Token);
+            //}
         }
     }
 }

@@ -38,17 +38,17 @@ namespace DotNet7_WebAPI.Middleware
                 //string? inputBody = reader.ReadToEnd();
                 string? inputBody = await reader.ReadToEndAsync();
                 // 바디 유효성 확인
-                if (IsbodyFormValid(context, inputBody, out string? id, out string? token) == false)
+                if (IsbodyFormValid(context, inputBody, out string? id, out string? requestToken) == false)
                 {
                     // 문제가 있으면 미들웨어에서 다음 delegate/middleware로 넘기지 않고 그냥 리턴해버림
                     // 클라에게 보낼 메세지는 체크 함수 내부에서 context.Response.Body.WriteAsync(...)에 담는다.
                     return;
                 }
-                if (id == null || token == null)
+                if (id == null || requestToken == null)
                 {
                     return;
                 }
-                if (isTokenValid(context, id, token) == false)
+                if (isTokenValid(context, id, requestToken) == false)
                 {
                     return;
                 }
@@ -80,8 +80,17 @@ namespace DotNet7_WebAPI.Middleware
             try
             {
                 // 공통적으로 포함되어야 할 id와 token이 있는지 확인
-                id = document.RootElement.GetProperty("id").GetString();
-                token = document.RootElement.GetProperty("token").GetString();
+                id = document.RootElement.GetProperty("ID").GetString();
+                //token = document.RootElement.GetProperty("token").GetString();
+                if (context.Request.Headers.TryGetValue("Token", out var traceValue) == false)
+                {
+                    return false;
+                }
+                if (string.IsNullOrEmpty(traceValue))
+                {
+                    return false;
+                }
+                token = traceValue;
                 return true;
             }
             catch(Exception ex)
@@ -91,32 +100,36 @@ namespace DotNet7_WebAPI.Middleware
             }
         }
 
-        private bool isTokenValid(HttpContext context, string id, string token)
+        private bool isTokenValid(HttpContext context, string id, string requestToken)
         {
-            ActiveUserModel? userInfoInDb;
+            //ActiveUserModel? userInfoInDb;
             string? userInfoJsonStr = RedisActiveUserService.GetActiveUserInfo(_activeUserDb.getRedisDB(), id);
             if (userInfoJsonStr == null)
             {
                 // context
                 return false;
             }
-            try
+            //try
+            //{
+            //    userInfoInDb = JsonSerializer.Deserialize<ActiveUserModel>(userInfoJsonStr);
+            //    if (userInfoInDb == null)
+            //    {
+            //        // context
+            //        return false;
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    // context
+            //    return false;
+            //}
+            //if (userInfoInDb.Token != token)
+            //{
+            //    // context
+            //    return false;
+            //}
+            if(string.IsNullOrEmpty(requestToken))
             {
-                userInfoInDb = JsonSerializer.Deserialize<ActiveUserModel>(userInfoJsonStr);
-                if (userInfoInDb == null)
-                {
-                    // context
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                // context
-                return false;
-            }
-            if (userInfoInDb.Token != token)
-            {
-                // context
                 return false;
             }
             // 토큰 유효기간 연장?
