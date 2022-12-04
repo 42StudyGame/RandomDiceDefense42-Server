@@ -27,21 +27,22 @@ namespace DotNet7_WebAPI.Service
     {
         public static void SetActiveUserInfo(IDatabase db, string ID, string userInfo)
         {
-            db.StringSet(ID, userInfo);
+            //db.StringSet(ID, userInfo);
+            db.HashSet("ActiveUserInfo", ID, userInfo);
         }
         public static string? GetActiveUserInfo(IDatabase db, string ID)
         {
-            return db.StringGet(ID);
+            //return db.StringGet(ID);
+            return db.HashGet("ActiveUserInfo", ID);
+        }
+        public static void SetScenarios(IDatabase db, string scenarioName, string jsonStr)
+        {
+            db.HashSet("Scenarios", scenarioName, jsonStr);
         }
 
-        public static int RegisterUser(IDatabase db, string ID, string Password)
+        public static string GetScenario(IDatabase db, string scenarioName)
         {
-            // 아이디 명 조건들... retun0
-            if (db.StringGet(ID).IsNullOrEmpty)
-                return -1;
-            string HashedPass;
-            db.StringSet(ID, Password);
-            return 1;
+            return db.HashGet("ActiveUserInfo", scenarioName);
         }
     }
 }

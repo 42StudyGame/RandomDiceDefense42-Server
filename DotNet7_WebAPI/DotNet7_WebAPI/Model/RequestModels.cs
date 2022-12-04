@@ -27,8 +27,9 @@
             ;
         }
     }
-    public class ScenarioRequestModel : AuthModel
+    public class ScenarioRequestModel
     {
-        public UInt16 RqusetState;
+        public string ID { set; get; }
+        public UInt16 RqusetState { set; get; }
     }
 }
