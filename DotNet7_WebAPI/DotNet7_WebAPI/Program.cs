@@ -6,11 +6,11 @@ using Microsoft.Extensions.FileProviders;
 using MySqlConnector;
 using static Pipelines.Sockets.Unofficial.Threading.MutexSlim;
 
-//var builder = WebApplication.CreateBuilder(args);
-var builder = WebApplication.CreateBuilder(new WebApplicationOptions
-{
-    ContentRootPath = Directory.GetCurrentDirectory(),
-});
+var builder = WebApplication.CreateBuilder(args);
+//var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+//{
+//    ContentRootPath = Directory.GetCurrentDirectory(),
+//});
 // Add services to the container.
 
 builder.Services.AddControllers();

@@ -26,7 +26,7 @@ namespace DotNet7_WebAPI.Controllers
         public IActionResult Post([FromBody] LoginInputModel login)
         {
             // DB에서 유저의 정보를 가져옴. 없는 유저라면 null을?
-            RtAcountDb rt = _accountDb.GetUser(login.ID);
+            RtAcountDb rt = _accountDb.GetAccoutInfo(login.ID);
             if (rt.isError == true)
             {
                 return BadRequest(rt.excecptionString);

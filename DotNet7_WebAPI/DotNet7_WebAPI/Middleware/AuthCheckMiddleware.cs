@@ -2,6 +2,7 @@
 using DotNet7_WebAPI.Service;
 using Microsoft.AspNetCore.Http;
 using StackExchange.Redis;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 
@@ -10,12 +11,14 @@ namespace DotNet7_WebAPI.Middleware
     public class AuthCheckMiddleware
     {
         private readonly RedisService _activeUserDb;
+        private readonly MysqlService _accountDb;
         private readonly RequestDelegate _next;
 
-        public AuthCheckMiddleware(RequestDelegate next, RedisService redisDb)
+        public AuthCheckMiddleware(RequestDelegate next, RedisService redisDb, MysqlService myslqDb)
         {
             _next = next;
             _activeUserDb = redisDb;
+            _accountDb= myslqDb;
         }
 
         public async Task Invoke(HttpContext context)
@@ -52,6 +55,13 @@ namespace DotNet7_WebAPI.Middleware
                 {
                     return;
                 }
+                if (formString.IndexOf("/Scenarios/") == 0)
+                {
+                    if (IsScenarioRequestValid(context, inputBody, id, out AccountDBModel? accountUserInfo) == false)
+                    {
+                        return;
+                    }
+                }
                 // need to enable buffering.
                 // 이걸 해줘야 아래의 await _next(context);도 성공함.
                 context.Request.Body.Position= 0;
@@ -80,6 +90,7 @@ namespace DotNet7_WebAPI.Middleware
             try
             {
                 // 공통적으로 포함되어야 할 id와 token이 있는지 확인
+                // TODO : tryGetProperty
                 id = document.RootElement.GetProperty("ID").GetString();
                 //token = document.RootElement.GetProperty("token").GetString();
                 if (context.Request.Headers.TryGetValue("Token", out var traceValue) == false)
@@ -134,6 +145,38 @@ namespace DotNet7_WebAPI.Middleware
             }
             // 토큰 유효기간 연장?
             return true;
+        }
+
+        private bool IsScenarioRequestValid(HttpContext context, string? body, string id, out AccountDBModel? AccoutUserInfo)
+        {
+            RtAcountDb rt = _accountDb.GetAccoutInfo(id);
+            if (rt.isError == true)
+            {
+                AccoutUserInfo = null;
+                return false;
+            }
+            AccoutUserInfo = rt.data;
+            var document = JsonDocument.Parse(body);
+            if (document.RootElement.TryGetProperty("RequestStage", out JsonElement requestStageObj))
+            {
+                UInt16 requestStage;
+                try
+                {
+                    requestStage = requestStageObj.GetUInt16();
+                }
+                catch(Exception ex)
+                {
+                    // 예외 처리
+                    return false;
+                }
+                if (requestStage > AccoutUserInfo.HighestStage)
+                {
+                    // 알려줘야함
+                    return false;
+                }
+                return true;
+            }
+            return false;
         }
     }
 }

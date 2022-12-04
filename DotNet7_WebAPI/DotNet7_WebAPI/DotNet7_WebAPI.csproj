@@ -14,14 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\Scenarios\UseStaticFiles.html" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Scenarios\UseStaticFiles.html" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="MessagePack" Version="2.4.59" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
@@ -30,6 +22,10 @@
     <PackageReference Include="SqlKata" Version="2.4.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.6.80" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>
