@@ -22,7 +22,7 @@ namespace DotNet7_WebAPI.Controllers
         {
             // 일단 유저의 정보를 가져와야 한다.
             // 일단 여기가지 왔으면 유저 아이디는 맞다고 봐야하나?
-            RtAcountDb rtUserInfo = _accoutDb.GetUser(value.ID);
+            RtAcountDb rtUserInfo = _accoutDb.GetAccoutInfo(value.ID);
             if (rtUserInfo.isError)
                 return BadRequest(rtUserInfo.excecptionString);
             if (value.RqusetState > rtUserInfo.data.HighestStage)

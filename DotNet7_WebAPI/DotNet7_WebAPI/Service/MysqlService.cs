@@ -43,7 +43,7 @@ namespace DotNet7_WebAPI.Service
         }
 
         // 여기 있는 함수들은 예외를 던지게 설계하는게 좋을듯.
-        public RtAcountDb GetUser(string id)
+        public RtAcountDb GetAccoutInfo(string id)
         {
             RtAcountDb rt = new RtAcountDb();
             rt.isError = false;
