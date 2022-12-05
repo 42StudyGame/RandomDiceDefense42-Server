@@ -33,10 +33,21 @@ namespace DotNet7_WebAPI.Service
                     _conn.Execute(SQL, User);
                     _conn.Close();
                 }
-                catch(Exception ex)
+                catch(MySqlException ex)
                 {
+                    // id 중복시 : 
+                    rt.mySqlErrorCode = ex.ErrorCode;
                     rt.isError = true;
-                    rt.excecptionString = ex.Message;
+                    //
+                    if (rt.mySqlErrorCode == MySqlErrorCode.DuplicateKeyName)
+                    {
+                        rt.excecptionString = "duplicate ID";
+                    }
+                    else
+                    {
+                        rt.excecptionString = "Any other reason...";
+                    }
+                        //rt.excecptionString = ex.Message; // 음...
                 }
             }
             return rt;
@@ -63,10 +74,12 @@ namespace DotNet7_WebAPI.Service
                     }
                     rt.data = sqlResult;
                 }
-                catch (Exception ex)
+                catch (MySqlException ex)
                 {
+                    rt.mySqlErrorCode = ex.ErrorCode;
                     rt.isError = true;
-                    rt.excecptionString = ex.Message;
+                    //rt.excecptionString = ex.Message;
+                    rt.excecptionString = "Any other reason...";
                 }
                 finally
                 {

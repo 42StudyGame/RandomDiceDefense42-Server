@@ -18,7 +18,7 @@ namespace DotNet7_WebAPI.Controllers
         }
 
         [HttpPost]
-        public void Post([FromBody] RegisterInputModel value)
+        public IActionResult Post([FromBody] RegisterInputModel value)
         {
             // 아이디 조건 확인
             string salt = Security.GetSalt();
@@ -31,7 +31,12 @@ namespace DotNet7_WebAPI.Controllers
                 RDBUser.HighestStage = 0;
                 RDBUser.HighestScore = 0;
                 //RDBUser.UserRank = "bronze";
-                _RDB.RegisterUser(RDBUser);
+                RtAcountDb rt = _RDB.RegisterUser(RDBUser);
+                if (rt.isError == true)
+                {
+                    return BadRequest(rt.excecptionString);
+                }
+                return Ok();
             }
         }
     }

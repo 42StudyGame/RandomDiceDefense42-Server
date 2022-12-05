@@ -41,18 +41,6 @@ namespace DotNet7_WebAPI.Controllers
             RedisActiveUserService.SetActiveUserInfo(_activeUserDb.getRedisDB(), login.ID, token);
             Response.Headers.Add("Token", token);
             return Ok();
-            //using (ActiveUserModel activeUser = new ActiveUserModel())
-            //{
-            //    // Token생성해서
-            //    activeUser.Token = Security.CreateAuthToken();
-            //    activeUser.ID = login.ID;
-            //    //activeUser.UserRank = rt.data.UserRank;
-            //    string jsonAccount = JsonSerializer.Serialize(activeUser);
-            //    // 모델은 redis에 저장. -> json형태로 변경.
-            //    RedisActiveUserService.SetActiveUserInfo(_activeUserDb.getRedisDB(), login.ID, jsonAccount);
-            //    // 토큰 클라에게 전달
-            //    return Ok(activeUser.Token);
-            //}
         }
     }
 }

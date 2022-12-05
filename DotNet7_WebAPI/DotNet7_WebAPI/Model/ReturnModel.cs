@@ -7,6 +7,7 @@
             isError= false;
         }
         public bool isError { get; set; }
+        public MySqlConnector.MySqlErrorCode? mySqlErrorCode { get; set; }
         public string? excecptionString { get; set; }
     }
 

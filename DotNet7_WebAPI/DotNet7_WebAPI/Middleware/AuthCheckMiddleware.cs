@@ -2,28 +2,50 @@
 using DotNet7_WebAPI.Service;
 using Microsoft.AspNetCore.Http;
 using StackExchange.Redis;
+using System.Net.Http;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 
 namespace DotNet7_WebAPI.Middleware
 {
+    public class ParsedInfos
+    {
+        public ParsedInfos()
+        {
+            RequestToken = null;
+            ID= null;
+            RequestStage = -1;
+        }
+        // header
+        public string? RequestToken { get; set; }
+        // body
+        public string? ID { get; set; }
+        public Int32? RequestStage { get; set; }
+    }
+
+    public class MiddlewareResponse
+    {
+        public string errorStr { get; set; }
+    }
+
     public class AuthCheckMiddleware
     {
         private readonly RedisService _activeUserDb;
         private readonly MysqlService _accountDb;
         private readonly RequestDelegate _next;
+        private ParsedInfos _parsedInfos;
 
         public AuthCheckMiddleware(RequestDelegate next, RedisService redisDb, MysqlService myslqDb)
         {
             _next = next;
             _activeUserDb = redisDb;
             _accountDb= myslqDb;
+            _parsedInfos = new ParsedInfos();
         }
 
         public async Task Invoke(HttpContext context)
         {
-            // 경로 검증
             var formString = context.Request.Path.Value;
             if (string.Compare(formString, "/login", StringComparison.OrdinalIgnoreCase) == 0 ||
                 string.Compare(formString, "/register", StringComparison.OrdinalIgnoreCase) == 0)
@@ -32,151 +54,119 @@ namespace DotNet7_WebAPI.Middleware
 
                 return;
             }
-            // 아래의 context.Request.Body.Position= 0;하기 위해서 필요.
-            context.Request.EnableBuffering();
-            // 토큰 검색
-            // http의 원시 바디는 한번 만 접근 할 수 있으므로, 스트림에 담아놓고 여러번 읽을 수 있게 함.
+            context.Request.EnableBuffering(); // 아래의 context.Request.Body.Position= 0;하기 위해서 필요.
             using (var reader = new System.IO.StreamReader(context.Request.Body, System.Text.Encoding.UTF8, true, 4096, true))
             {
-                //string? inputBody = reader.ReadToEnd();
                 string? inputBody = await reader.ReadToEndAsync();
-                // 바디 유효성 확인
-                if (IsbodyFormValid(context, inputBody, out string? id, out string? requestToken) == false)
-                {
-                    // 문제가 있으면 미들웨어에서 다음 delegate/middleware로 넘기지 않고 그냥 리턴해버림
-                    // 클라에게 보낼 메세지는 체크 함수 내부에서 context.Response.Body.WriteAsync(...)에 담는다.
-                    return;
-                }
-                if (id == null || requestToken == null)
+                if (await IsbodyFormValid(context, inputBody) == false)
                 {
                     return;
                 }
-                if (isTokenValid(context, id, requestToken) == false)
+                if (await isTokenValid(context) == false)
                 {
                     return;
                 }
                 if (formString.IndexOf("/Scenarios/") == 0)
                 {
-                    if (IsScenarioRequestValid(context, inputBody, id, out AccountDBModel? accountUserInfo) == false)
+                    if (await IsScenarioRequestValid(context) == false)
                     {
                         return;
                     }
                 }
-                // need to enable buffering.
-                // 이걸 해줘야 아래의 await _next(context);도 성공함.
                 context.Request.Body.Position= 0;
             }
-            //context.Response.Body.Position= 0;
-            //context.Request.Body.Position = 0;   
-            // 문제 없으면 다음 delegate/middleware로 context를 넘김
-            // 근데.. 뭐 성공해도 뭐 전치리 해서 담아서 옮겨야 하나?
             await _next(context);
             return;
         }
-        private bool IsbodyFormValid(HttpContext context, string? body, out string? id, out string? token)
+        private async Task<bool> IsbodyFormValid(HttpContext context, string? body)
         {
-            id = null;
-            token = null;
-
-            // body가 있는지
             if (string.IsNullOrEmpty(body))
             {
-                // 실패시 사유를 context의 response body에 넣어준다.
+                // 그냥 잘못된 입력.
+                await SetErrorInfo(context, 400, "bad requset");
                 return false;
             }
-            // json 형태로 토큰이랑 잘 왔는지
-            // 일단 어떤 형태로 온 지 알 수 없으니, json으로 일단 파싱
             var document = JsonDocument.Parse(body);
             try
             {
-                // 공통적으로 포함되어야 할 id와 token이 있는지 확인
-                // TODO : tryGetProperty
-                id = document.RootElement.GetProperty("ID").GetString();
-                //token = document.RootElement.GetProperty("token").GetString();
-                if (context.Request.Headers.TryGetValue("Token", out var traceValue) == false)
+                if (document.RootElement.TryGetProperty("ID", out var traceID) == false
+                    || context.Request.Headers.TryGetValue("Token", out var traceToken) == false)
                 {
+                    // ID, token없는 잘못된 입력.
+                    await SetErrorInfo(context, 400, "No ID or Token");
                     return false;
                 }
-                if (string.IsNullOrEmpty(traceValue))
-                {
-                    return false;
-                }
-                token = traceValue;
+                //if (string.IsNullOrEmpty(_parsedInfos.RequestToken = traceToken.ToString())
+                //    || string.IsNullOrEmpty(_parsedInfos.ID = traceID.ToString()))
+                //{
+                //    await SetErrorInfo(context, 400, "bad requset");
+                //    return false;
+                //}
+                /////////////////////////////////////////////
+                /// 바디나 헤더에서 추가적으로 파싱할 내용이 있다면 여기에 입력.
+                document.RootElement.TryGetProperty("requestStage", out var traceRequestStage);
+                _parsedInfos.RequestStage = traceRequestStage.GetUInt16();
+                /////////////////////////////////////////////
                 return true;
             }
             catch(Exception ex)
             {
-                // 실패시 사유를 context의 response body에 넣어준다.
+                // 기타 ㅇ예외들
+                await SetErrorInfo(context, 500, "server code exception");
                 return false;
             }
         }
 
-        private bool isTokenValid(HttpContext context, string id, string requestToken)
+        private async Task<bool> isTokenValid(HttpContext context)
         {
             //ActiveUserModel? userInfoInDb;
-            string? userInfoJsonStr = RedisActiveUserService.GetActiveUserInfo(_activeUserDb.getRedisDB(), id);
-            if (userInfoJsonStr == null)
+            string? userInfoJsonStr = RedisActiveUserService.GetActiveUserInfo(_activeUserDb.getRedisDB(), _parsedInfos.ID);
+            if (string.IsNullOrEmpty(userInfoJsonStr))
             {
-                // context
+                // 레디스에 유저 정보 없음
+                await SetErrorInfo(context, 400, "invalid user");
                 return false;
             }
-            //try
-            //{
-            //    userInfoInDb = JsonSerializer.Deserialize<ActiveUserModel>(userInfoJsonStr);
-            //    if (userInfoInDb == null)
-            //    {
-            //        // context
-            //        return false;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    // context
-            //    return false;
-            //}
-            //if (userInfoInDb.Token != token)
-            //{
-            //    // context
-            //    return false;
-            //}
-            if(string.IsNullOrEmpty(requestToken))
+            if(userInfoJsonStr.Equals(_parsedInfos.RequestToken) == false)
             {
+                // 레디스에 저장된 토큰과 틀림. ->  클라에서 다시 로그인 하게 만들기.
+                await SetErrorInfo(context, 400, "invalid token");
                 return false;
             }
             // 토큰 유효기간 연장?
             return true;
         }
 
-        private bool IsScenarioRequestValid(HttpContext context, string? body, string id, out AccountDBModel? AccoutUserInfo)
+        private async Task<bool> IsScenarioRequestValid(HttpContext context)
         {
-            RtAcountDb rt = _accountDb.GetAccoutInfo(id);
+            // 이미 위에서 검사하므로, null 경고 무시
+            RtAcountDb rt = _accountDb.GetAccoutInfo(_parsedInfos.ID);
             if (rt.isError == true)
             {
-                AccoutUserInfo = null;
+                // 유저 ID가 틀림
+                await SetErrorInfo(context, 400, "invalid user");
                 return false;
             }
-            AccoutUserInfo = rt.data;
-            var document = JsonDocument.Parse(body);
-            if (document.RootElement.TryGetProperty("RequestStage", out JsonElement requestStageObj))
+            AccountDBModel AccoutUserInfo = rt.data;
+            if (_parsedInfos.RequestStage > AccoutUserInfo.HighestStage)
             {
-                UInt16 requestStage;
-                try
-                {
-                    requestStage = requestStageObj.GetUInt16();
-                }
-                catch(Exception ex)
-                {
-                    // 예외 처리
-                    return false;
-                }
-                if (requestStage > AccoutUserInfo.HighestStage)
-                {
-                    // 알려줘야함
-                    return false;
-                }
-                return true;
+                // 스테이지 요청이 틀림
+                await SetErrorInfo(context, 409, "invalid Stage request");
+                return false;
             }
-            return false;
+            return true;
+        }
+
+        private async Task<bool> SetErrorInfo(HttpContext context, int errorCode, string occurredErrorStr)
+        {
+            var errorJsonResponse = JsonSerializer.Serialize(new MiddlewareResponse
+            {
+                errorStr = occurredErrorStr
+            });
+            byte[] errorBytes = Encoding.UTF8.GetBytes(errorJsonResponse);
+            context.Response.StatusCode = errorCode;
+            await context.Response.Body.WriteAsync(errorBytes, 0, errorBytes.Length);
+            return true;
         }
     }
 }
