@@ -1,0 +1,14 @@
+version: "3"
+services:
+  db:
+    image: mysql
+    container_name: mysql-server
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1q2w3e4r
+    command: # 명령어 실행
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./data/:/var/lib/mysql
