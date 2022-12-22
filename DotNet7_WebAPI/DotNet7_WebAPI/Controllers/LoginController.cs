@@ -13,13 +13,13 @@ namespace DotNet7_WebAPI.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
-        MysqlService _accountDb;
-        RedisService _activeUserDb;
+        IAccountDbService _accountDb;
+        IActiveUserDbService _activeUserDb;
 
-        public LoginController(MysqlService mysql, RedisService redis)
+        public LoginController(IAccountDbService accountDb, IActiveUserDbService activeUserDb)
         {
-            _accountDb = mysql;
-            _activeUserDb = redis;
+            _accountDb = accountDb;
+            _activeUserDb = activeUserDb;
         }
 
         [HttpPost]
@@ -38,7 +38,7 @@ namespace DotNet7_WebAPI.Controllers
             }
             string token = Security.CreateAuthToken();
             // 필요시 token이외에 다른 정보도 합쳐서 저장
-            RedisActiveUserService.SetActiveUserInfo(_activeUserDb.getRedisDB(), login.ID, token);
+            _activeUserDb.SetActiveUserInfo(login.ID, token);
             Response.Headers.Add("Token", token);
             return Ok();
         }

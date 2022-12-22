@@ -1,5 +1,6 @@
 ﻿using DotNet7_WebAPI.Model;
 using DotNet7_WebAPI.Service;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -18,8 +19,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<DbConfig>(builder.Configuration.GetSection("DbConfig")); // Todo
-builder.Services.AddTransient<MysqlService>();
-builder.Services.AddSingleton<RedisService>();
+builder.Services.AddTransient<IAccountDbService, MysqlService>();
+builder.Services.AddSingleton<IActiveUserDbService, RedisActiveUserService>();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -27,25 +28,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-//app.UseStaticFiles();
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = new PhysicalFileProvider(
-//           Path.Combine(builder.Environment.ContentRootPath, "Scenarios")),
-//    RequestPath = "/Scenarioss"
-//});
+
 app.UseMiddleware<DotNet7_WebAPI.Middleware.AuthCheckMiddleware>();
 app.UseHttpsRedirection();
-//app.UseStaticFiles();
-app.UseFileServer(new FileServerOptions
-{
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Scenarios")),
-    RequestPath = "/Scenarios",
-    EnableDefaultFiles= true
-});
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
