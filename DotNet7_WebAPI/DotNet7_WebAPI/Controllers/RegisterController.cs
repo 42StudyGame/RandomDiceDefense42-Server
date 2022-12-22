@@ -11,10 +11,10 @@ namespace DotNet7_WebAPI.Controllers
     [ApiController]
     public class RegisterController : ControllerBase
     {
-        MysqlService _RDB;
-        public RegisterController(MysqlService mysql)
+        IAccountDbService _accountDb;
+        public RegisterController(IAccountDbService accountDb)
         {
-            _RDB = mysql;
+            _accountDb = accountDb;
         }
 
         [HttpPost]
@@ -31,7 +31,7 @@ namespace DotNet7_WebAPI.Controllers
                 RDBUser.HighestStage = 0;
                 RDBUser.HighestScore = 0;
                 //RDBUser.UserRank = "bronze";
-                RtAcountDb rt = _RDB.RegisterUser(RDBUser);
+                RtAcountDb rt = _accountDb.RegisterAccount(RDBUser);
                 if (rt.isError == true)
                 {
                     return BadRequest(rt.excecptionString);

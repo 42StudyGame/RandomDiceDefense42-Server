@@ -31,12 +31,12 @@ namespace DotNet7_WebAPI.Middleware
 
     public class AuthCheckMiddleware
     {
-        private readonly RedisService _activeUserDb;
-        private readonly MysqlService _accountDb;
+        private readonly IActiveUserDbService _activeUserDb;
+        private readonly IAccountDbService _accountDb;
         private readonly RequestDelegate _next;
         private ParsedInfos _parsedInfos;
 
-        public AuthCheckMiddleware(RequestDelegate next, RedisService redisDb, MysqlService myslqDb)
+        public AuthCheckMiddleware(RequestDelegate next, IActiveUserDbService redisDb, IAccountDbService myslqDb)
         {
             _next = next;
             _activeUserDb = redisDb;
@@ -66,13 +66,6 @@ namespace DotNet7_WebAPI.Middleware
                 {
                     return;
                 }
-                if (formString.IndexOf("/Scenarios/") == 0)
-                {
-                    if (await IsScenarioRequestValid(context) == false)
-                    {
-                        return;
-                    }
-                }
                 context.Request.Body.Position= 0;
             }
             await _next(context);
@@ -96,12 +89,6 @@ namespace DotNet7_WebAPI.Middleware
                     await SetErrorInfo(context, 400, "No ID or Token");
                     return false;
                 }
-                //if (string.IsNullOrEmpty(_parsedInfos.RequestToken = traceToken.ToString())
-                //    || string.IsNullOrEmpty(_parsedInfos.ID = traceID.ToString()))
-                //{
-                //    await SetErrorInfo(context, 400, "bad requset");
-                //    return false;
-                //}
                 /////////////////////////////////////////////
                 /// 바디나 헤더에서 추가적으로 파싱할 내용이 있다면 여기에 입력.
                 document.RootElement.TryGetProperty("requestStage", out var traceRequestStage);
@@ -120,7 +107,7 @@ namespace DotNet7_WebAPI.Middleware
         private async Task<bool> isTokenValid(HttpContext context)
         {
             //ActiveUserModel? userInfoInDb;
-            string? userInfoJsonStr = RedisActiveUserService.GetActiveUserInfo(_activeUserDb.getRedisDB(), _parsedInfos.ID);
+            string? userInfoJsonStr = _activeUserDb.GetActiveUserInfo(_parsedInfos.ID);
             if (string.IsNullOrEmpty(userInfoJsonStr))
             {
                 // 레디스에 유저 정보 없음
@@ -134,26 +121,6 @@ namespace DotNet7_WebAPI.Middleware
                 return false;
             }
             // 토큰 유효기간 연장?
-            return true;
-        }
-
-        private async Task<bool> IsScenarioRequestValid(HttpContext context)
-        {
-            // 이미 위에서 검사하므로, null 경고 무시
-            RtAcountDb rt = _accountDb.GetAccoutInfo(_parsedInfos.ID);
-            if (rt.isError == true)
-            {
-                // 유저 ID가 틀림
-                await SetErrorInfo(context, 400, "invalid user");
-                return false;
-            }
-            AccountDBModel AccoutUserInfo = rt.data;
-            if (_parsedInfos.RequestStage > AccoutUserInfo.HighestStage)
-            {
-                // 스테이지 요청이 틀림
-                await SetErrorInfo(context, 409, "invalid Stage request");
-                return false;
-            }
             return true;
         }
 

@@ -4,11 +4,10 @@ using MySqlConnector;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
-using SqlKata;
 
 namespace DotNet7_WebAPI.Service
 {
-    public class MysqlService
+    public class MysqlService : IAccountDbService
     { 
         private string _connectionString;
         private MySqlConnection _conn;
@@ -20,7 +19,7 @@ namespace DotNet7_WebAPI.Service
             _conn = new MySqlConnection(_connectionString);
         }
 
-        public RtAcountDb RegisterUser(AccountDBModel User)
+        public RtAcountDb RegisterAccount(AccountDBModel User)
         {
             RtAcountDb rt = new RtAcountDb();
             string SQL = "INSERT INTO t_user(id, hashedPassword, salt, highestStage, highestScore) " +
