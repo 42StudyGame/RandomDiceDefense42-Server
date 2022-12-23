@@ -34,19 +34,15 @@ namespace DotNet7_WebAPI.Service
                 }
                 catch(MySqlException ex)
                 {
-                    // id 중복시 : 
-                    rt.mySqlErrorCode = ex.ErrorCode;
-                    rt.isError = true;
-                    //
-                    if (rt.mySqlErrorCode == MySqlErrorCode.DuplicateKeyName)
+                    // id 중복시
+                    if (ex.ErrorCode == MySqlErrorCode.DuplicateKeyName)
                     {
-                        rt.excecptionString = "duplicate ID";
+                        rt.errorCode = ErrorCode.DuplicatedID;
                     }
                     else
                     {
-                        rt.excecptionString = "Any other reason...";
+                        rt.errorCode = ErrorCode.NotDefindedError;
                     }
-                        //rt.excecptionString = ex.Message; // 음...
                 }
             }
             return rt;
@@ -56,7 +52,6 @@ namespace DotNet7_WebAPI.Service
         public RtAcountDb GetAccoutInfo(string id)
         {
             RtAcountDb rt = new RtAcountDb();
-            rt.isError = false;
             var parameters = new {ID = id};
             string SQL = "SELECT * FROM t_user WHERE id=@ID";
             using (_conn)
@@ -67,24 +62,21 @@ namespace DotNet7_WebAPI.Service
                     AccountDBModel sqlResult = _conn.QuerySingleOrDefault<AccountDBModel>(SQL, parameters);
                     if (sqlResult == null)
                     {
-                        rt.isError = true;
-                        rt.excecptionString = "no such user";
+                        rt.errorCode = ErrorCode.WrongID;
                         return rt;
                     }
                     rt.data = sqlResult;
                 }
                 catch (MySqlException ex)
                 {
-                    rt.mySqlErrorCode = ex.ErrorCode;
-                    rt.isError = true;
-                    //rt.excecptionString = ex.Message;
-                    rt.excecptionString = "Any other reason...";
+                    rt.errorCode = ErrorCode.NotDefindedError;
                 }
                 finally
                 {
                     _conn.Close(); 
                 }
             }
+            rt.errorCode = ErrorCode.NoError;
             return rt;
         }
     }
