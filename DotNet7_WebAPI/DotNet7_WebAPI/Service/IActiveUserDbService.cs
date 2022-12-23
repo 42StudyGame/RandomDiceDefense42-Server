@@ -6,7 +6,7 @@ namespace DotNet7_WebAPI.Service
 {
     public interface IActiveUserDbService
     {
-        public void SetActiveUserInfo(string ID, string userInfo);
-        public string? GetActiveUserInfo(string ID);
+        public RtActiveUserDb SetActiveUserInfo(string ID, string userInfo);
+        public RtActiveUserDb GetActiveUserInfo(string ID);
     }
 }

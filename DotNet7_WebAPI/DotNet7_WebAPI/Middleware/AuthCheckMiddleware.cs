@@ -24,11 +24,6 @@ namespace DotNet7_WebAPI.Middleware
         public Int32? RequestStage { get; set; }
     }
 
-    public class MiddlewareResponse
-    {
-        public string errorStr { get; set; }
-    }
-
     public class AuthCheckMiddleware
     {
         private readonly IActiveUserDbService _activeUserDb;
@@ -76,7 +71,7 @@ namespace DotNet7_WebAPI.Middleware
             if (string.IsNullOrEmpty(body))
             {
                 // 그냥 잘못된 입력.
-                await SetErrorInfo(context, 400, "bad requset");
+                await SetErrorInfo(context, 400, ErrorCode.WrongRequest);
                 return false;
             }
             var document = JsonDocument.Parse(body);
@@ -86,7 +81,7 @@ namespace DotNet7_WebAPI.Middleware
                     || context.Request.Headers.TryGetValue("Token", out var traceToken) == false)
                 {
                     // ID, token없는 잘못된 입력.
-                    await SetErrorInfo(context, 400, "No ID or Token");
+                    await SetErrorInfo(context, 400, ErrorCode.WrongRequest);
                     return false;
                 }
                 /////////////////////////////////////////////
@@ -99,7 +94,7 @@ namespace DotNet7_WebAPI.Middleware
             catch(Exception ex)
             {
                 // 기타 ㅇ예외들
-                await SetErrorInfo(context, 500, "server code exception");
+                await SetErrorInfo(context, 500, ErrorCode.NotDefindedError);
                 return false;
             }
         }
@@ -107,31 +102,32 @@ namespace DotNet7_WebAPI.Middleware
         private async Task<bool> isTokenValid(HttpContext context)
         {
             //ActiveUserModel? userInfoInDb;
-            string? userInfoJsonStr = _activeUserDb.GetActiveUserInfo(_parsedInfos.ID);
-            if (string.IsNullOrEmpty(userInfoJsonStr))
+            RtActiveUserDb userInfo = _activeUserDb.GetActiveUserInfo(_parsedInfos.ID);
+            if (userInfo.errorCode != ErrorCode.NoError)
             {
                 // 레디스에 유저 정보 없음
-                await SetErrorInfo(context, 400, "invalid user");
+                await SetErrorInfo(context, 400, ErrorCode.WrongID);
+                // body조작도 필요
                 return false;
             }
-            if(userInfoJsonStr.Equals(_parsedInfos.RequestToken) == false)
+            if(userInfo.Token.Equals(_parsedInfos.RequestToken) == false)
             {
                 // 레디스에 저장된 토큰과 틀림. ->  클라에서 다시 로그인 하게 만들기.
-                await SetErrorInfo(context, 400, "invalid token");
+                await SetErrorInfo(context, 400, ErrorCode.WrongToken);
                 return false;
             }
             // 토큰 유효기간 연장?
             return true;
         }
 
-        private async Task<bool> SetErrorInfo(HttpContext context, int errorCode, string occurredErrorStr)
+        private async Task<bool> SetErrorInfo(HttpContext context, int statusCode, ErrorCode occuredErrorCode)
         {
-            var errorJsonResponse = JsonSerializer.Serialize(new MiddlewareResponse
+            var errorJsonResponse = JsonSerializer.Serialize(new RsMiddleWare
             {
-                errorStr = occurredErrorStr
-            });
+                errorCode = occuredErrorCode
+            }) ;
             byte[] errorBytes = Encoding.UTF8.GetBytes(errorJsonResponse);
-            context.Response.StatusCode = errorCode;
+            context.Response.StatusCode = statusCode;
             await context.Response.Body.WriteAsync(errorBytes, 0, errorBytes.Length);
             return true;
         }

@@ -16,15 +16,32 @@ namespace DotNet7_WebAPI.Service
             redisDB = redis.GetDatabase();
         }
 
-        public void SetActiveUserInfo(string ID, string userInfo)
+        public RtActiveUserDb SetActiveUserInfo(string ID, string userInfo)
         {
             //db.StringSet(ID, userInfo);
-            redisDB.HashSet("ActiveUserInfo", ID, userInfo);
+            RtActiveUserDb rt = new RtActiveUserDb();
+            if (redisDB.HashSet("ActiveUserInfo", ID, userInfo) == false)
+            {
+                rt.errorCode = ErrorCode.NotDefindedError;
+                return rt;
+            }
+            rt.errorCode = ErrorCode.NoError;
+            return rt;
         }
-        public string? GetActiveUserInfo(string ID)
+        public RtActiveUserDb GetActiveUserInfo(string ID)
         {
             //return db.StringGet(ID);
-            return redisDB.HashGet("ActiveUserInfo", ID);
+            RtActiveUserDb rt = new RtActiveUserDb();
+            rt.Token = redisDB.HashGet("ActiveUserInfo", ID);
+            if (rt.Token== null)
+            {
+                //rt.isError = true;
+                rt.errorCode = ErrorCode.WrongID;
+                return rt;
+            }
+            rt.errorCode = ErrorCode.NoError;
+            //rt.isError=false;
+            return rt;
         }
         //public void SetScenarios(string scenarioName, string jsonStr)
         //{

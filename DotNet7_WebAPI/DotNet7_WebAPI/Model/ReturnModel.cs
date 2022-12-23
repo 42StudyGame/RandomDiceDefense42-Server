@@ -2,22 +2,16 @@
 {
     public class RtCommon
     {
-        public RtCommon()
-        {
-            isError= false;
-        }
-        public bool isError { get; set; }
-        public MySqlConnector.MySqlErrorCode? mySqlErrorCode { get; set; }
-        public string? excecptionString { get; set; }
+        public ErrorCode errorCode { get; set; }
     }
 
     public class RtAcountDb : RtCommon
     {
         public AccountDBModel data { get; set; }
     }
-    public class RtLoginResult
+    public class RtActiveUserDb : RtCommon
     { 
-        public string ID { get; set; }
+        //public string ID { get; set; }
         public string Token { get; set; }
     }
 

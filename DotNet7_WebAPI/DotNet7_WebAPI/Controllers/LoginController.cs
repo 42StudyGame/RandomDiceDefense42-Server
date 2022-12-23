@@ -23,24 +23,27 @@ namespace DotNet7_WebAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] LoginInputModel login)
+        public IActionResult Post([FromBody] RqLogin login)
         {
             // DB에서 유저의 정보를 가져옴. 없는 유저라면 null을?
             RtAcountDb rt = _accountDb.GetAccoutInfo(login.ID);
-            if (rt.isError == true)
+            RsLogin rs = new RsLogin();
+            rs.errorCode = rt.errorCode;
+            if (rt.errorCode != ErrorCode.NoError)
             {
-                return BadRequest(rt.excecptionString);
+                return BadRequest(rs);
             }
             //비밀번호 확인
             if (Security.MakeHashingPassWord(rt.data.Salt, login.Password) != rt.data.HashedPassword)
             {
-                return BadRequest("Wrong Password");
+                rs.errorCode = ErrorCode.WrongPassword;
+                return BadRequest(rs);
             }
             string token = Security.CreateAuthToken();
             // 필요시 token이외에 다른 정보도 합쳐서 저장
             _activeUserDb.SetActiveUserInfo(login.ID, token);
             Response.Headers.Add("Token", token);
-            return Ok();
+            return Ok(rs);
         }
     }
 }
