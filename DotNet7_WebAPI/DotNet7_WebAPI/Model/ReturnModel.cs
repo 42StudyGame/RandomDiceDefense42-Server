@@ -15,4 +15,8 @@
         public string Token { get; set; }
     }
 
+    public class RtScenarioService : RtCommon
+    {
+        public string? Scenario { get; set; }
+    }
 }
