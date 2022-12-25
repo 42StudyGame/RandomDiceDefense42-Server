@@ -86,10 +86,17 @@ namespace DotNet7_WebAPI.Middleware
                 }
                 /////////////////////////////////////////////
                 /// 바디나 헤더에서 추가적으로 파싱할 내용이 있다면 여기에 입력.
-                document.RootElement.TryGetProperty("requestStage", out var traceRequestStage);
+                document.RootElement.TryGetProperty("RequestStage", out var traceRequestStage);
                 _parsedInfos.RequestStage = traceRequestStage.GetUInt16();
+                _parsedInfos.ID = traceID.GetString();
+                _parsedInfos.RequestToken = traceToken;
                 /////////////////////////////////////////////
                 return true;
+            }
+            catch(FormatException ex)
+            {
+                await SetErrorInfo(context, 400, ErrorCode.WrongRequest);
+                return false;
             }
             catch(Exception ex)
             {

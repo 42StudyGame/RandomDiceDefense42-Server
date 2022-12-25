@@ -16,6 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<DbConfig>(builder.Configuration.GetSection("DbConfig")); // Todo
 builder.Services.AddTransient<IAccountDbService, MysqlService>();
 builder.Services.AddSingleton<IActiveUserDbService, RedisActiveUserService>();
+builder.Services.AddSingleton<ScenarioService>();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
