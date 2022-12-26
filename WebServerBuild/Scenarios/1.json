@@ -1,0 +1,55 @@
+﻿{
+  "waveList": [
+    {
+      "wave": 1,
+      "enemyHPOffset": 1,
+      "waveStartDelay": 3,
+      "spawnDelay": 1.0,
+      "enemyList": [
+        0,
+        0,
+        0
+      ],
+      "boss": 3
+    },
+    {
+      "wave": 2,
+      "enemyHPOffset": 2,
+      "waveStartDelay": 3,
+      "spawnDelay": 1.0,
+      "enemyList": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "wave": 3,
+      "enemyHPOffset": 3,
+      "waveStartDelay": 3,
+      "spawnDelay": 1.0,
+      "enemyList": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "wave": 4,
+      "enemyHPOffset": 4,
+      "waveStartDelay": 3,
+      "spawnDelay": 1.0,
+      "enemyList": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    }
+  ]
+}
