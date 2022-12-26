@@ -9,13 +9,23 @@ namespace DotNet7_WebAPI.Service
 {
     public class MysqlService : IAccountDbService
     { 
-        private string _connectionString;
+        private string? _connectionString;
         private MySqlConnection _conn;
 
-        public MysqlService(IOptions<DbConfig> dbconfig) // TODO : config가져오는 방식
+        
+        //public MysqlService(IOptions<DbConfig> dbconfig) // TODO : config가져오는 방식
+        //{
+
+        //    _connectionString = dbconfig.Value.AccountDB;
+        //    _conn = new MySqlConnection(_connectionString);
+        //}
+        public MysqlService() // TODO : config가져오는 방식
         {
-            
-            _connectionString = dbconfig.Value.AccountDB;
+            _connectionString = Environment.GetEnvironmentVariable("CONN_STR_ACCOUNT");
+            if (string.IsNullOrEmpty(_connectionString))
+            {
+                return;
+            }
             _conn = new MySqlConnection(_connectionString);
         }
 

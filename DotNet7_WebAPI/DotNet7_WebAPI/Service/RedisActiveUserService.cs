@@ -12,7 +12,7 @@ namespace DotNet7_WebAPI.Service
         
         public RedisActiveUserService(IOptions<DbConfig> dbconfig)
         {
-            redis = ConnectionMultiplexer.Connect(dbconfig.Value.ActiveUserDb);
+            redis = ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("CONN_STR_ACTIVE_USER_DB"));
             redisDB = redis.GetDatabase();
         }
 
@@ -30,9 +30,10 @@ namespace DotNet7_WebAPI.Service
         }
         public RtActiveUserDb GetActiveUserInfo(string ID)
         {
-            //return db.StringGet(ID);
-            RtActiveUserDb rt = new RtActiveUserDb();
-            rt.Token = redisDB.HashGet("ActiveUserInfo", ID);
+            RtActiveUserDb rt = new RtActiveUserDb
+            {
+                Token = redisDB.HashGet("ActiveUserInfo", ID)
+            };
             if (rt.Token== null)
             {
                 //rt.isError = true;
@@ -40,17 +41,7 @@ namespace DotNet7_WebAPI.Service
                 return rt;
             }
             rt.errorCode = ErrorCode.NoError;
-            //rt.isError=false;
             return rt;
         }
-        //public void SetScenarios(string scenarioName, string jsonStr)
-        //{
-        //    redisDB.HashSet("Scenarios", scenarioName, jsonStr);
-        //}
-
-        //public string GetScenario(string scenarioName)
-        //{
-        //    return db.HashGet("ActiveUserInfo", scenarioName);
-        //}
     }
 }

@@ -1,0 +1,49 @@
+version: "3"
+services:
+  server:
+    image: dotnet7_webapi:1.0.0
+    container_name: "${CON_WEB_SERVER}"
+    depends_on:
+      - account_db
+      - active_user_db
+    ports:
+      - "5000:80"
+    networks:
+      - net_random_dice
+    environment:
+      - CONN_STR_ACCOUNT=Server=${CON_ACCOUNT_DB};uid=${ACCOUNT_DB_ID};pwd=${ACCOUNT_DB_PASS};database=${ACCOUNT_DB_DBNAME}
+      - CONN_STR_ACTIVE_USER_DB=${CON_ACTIVE_USER_DB}:${ACTIVE_USER_DB_PORT},password=${ACTIVE_USER_DB_PASS},ssl=False,abortConnect=False
+
+  account_db:
+    image: mysql
+    container_name: "${CON_ACCOUNT_DB}"
+    ports:
+      - "${ACCOUNT_DB_PORT}:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${ACCOUNT_DB_PASS}
+    command: # 명령어 실행
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./data/:/var/lib/mysql
+    networks:
+      - net_random_dice
+
+  active_user_db:
+    image: redis
+    container_name: ${CON_ACTIVE_USER_DB}
+    #hostname: redis_standalone
+    command: redis-server --port ${ACTIVE_USER_DB_PORT}
+    environment:
+      - REDIS_PASSWORD=1q2w3e4r
+    ports:
+      - "${ACTIVE_USER_DB_PORT}:6379"
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    networks:
+      - net_random_dice
+
+networks:
+  net_random_dice:
+    driver: bridge
