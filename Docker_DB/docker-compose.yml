@@ -25,7 +25,9 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     volumes:
-      - ./data/:/var/lib/mysql
+      - ./data:/var/lib/mysql
+      - ./etc:/mysql/conf.d
+      #- ./log/mysqld.log:/var/log/mysqld.log
     networks:
       - net_random_dice
 
