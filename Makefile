@@ -12,7 +12,7 @@ web :
 	dotnet publish $(WEB_PROJ_DIR) --output $(WEB_BUILD_DIR) --os linux --arch x64 -c Release -p:PublishProfile=DefaultContainer
 
 down :
-	-docker compose -f $(DB_DIR)/docker-compose.yml down
+	-docker compose -f $(DB_DIR)/docker-compose.yml down -v
 
 re : rm up
 
