@@ -26,12 +26,12 @@ services:
       - --collation-server=utf8mb4_unicode_ci
       - --lower_case_table_names=1
     volumes:
-      - ./data:/var/lib/mysql
+      - vol_accout_db:/var/lib/mysql
       #- ./etc:/mysql/conf.d
       #- ./log/mysqld.log:/var/log/mysqld.log
     networks:
       - net_random_dice
-
+# 전용 볼륨 추ㅡ가
   active_user_db:
     image: redis
     container_name: ${CON_ACTIVE_USER_DB}
@@ -50,3 +50,11 @@ services:
 networks:
   net_random_dice:
     driver: bridge
+
+volumes:
+  vol_accout_db:
+    driver: local
+    driver_opts:
+      device: ./data
+      o: bind
+      type: none
