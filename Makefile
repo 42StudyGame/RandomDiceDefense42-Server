@@ -5,10 +5,11 @@ WEB_PROJ_DIR=./DotNet7_WebAPI/DotNet7_WebAPI/DotNet7_WebAPI.csproj
 WEB_BUILD_DIR=WebServerBuild
 
 ALL : up
-up : down
-	-docker image rm $(WEB_PROJ):1.0.0
+up :
+	docker compose -f $(DB_DIR)/docker-compose.yml up --build --force-recreate -d
+
+web :
 	dotnet publish $(WEB_PROJ_DIR) --output $(WEB_BUILD_DIR) --os linux --arch x64 -c Release -p:PublishProfile=DefaultContainer
-	docker compose -f $(DB_DIR)/docker-compose.yml up -d
 
 down :
 	-docker compose -f $(DB_DIR)/docker-compose.yml down
