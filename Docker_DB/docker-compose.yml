@@ -11,31 +11,36 @@ services:
     networks:
       - net_random_dice
     environment:
-      - CONN_STR_ACCOUNT=Server=${CON_ACCOUNT_DB};uid=${ACCOUNT_DB_ID};pwd=${ACCOUNT_DB_PASS};database=${ACCOUNT_DB_DBNAME}
+      - CONN_STR_ACCOUNT=Server=${CON_ACCOUNT_DB};uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE}
       - CONN_STR_ACTIVE_USER_DB=${CON_ACTIVE_USER_DB}:${ACTIVE_USER_DB_PORT},password=${ACTIVE_USER_DB_PASS},ssl=False,abortConnect=False
 
   account_db:
+    
     image: mysql
     container_name: "${CON_ACCOUNT_DB}"
     ports:
-      - "${ACCOUNT_DB_PORT}:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=${ACCOUNT_DB_PASS}
+      - "${MYSQL_PORT}:3306"
     command: # 명령어 실행
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --lower_case_table_names=1
     volumes:
-      - vol_accout_db:/var/lib/mysql
-      #- ./etc:/mysql/conf.d
-      #- ./log/mysqld.log:/var/log/mysqld.log
+      - ./account_db/conf.d:/etc/mysql/conf.d
+      - ./account_db/initdb.d/:/docker-entrypoint-initdb.d/
+    expose:
+      - 3306
     networks:
       - net_random_dice
-# 전용 볼륨 추ㅡ가
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
   active_user_db:
     image: redis
     container_name: ${CON_ACTIVE_USER_DB}
-    #hostname: redis_standalone
     command: redis-server --port ${ACTIVE_USER_DB_PORT}
     environment:
       - REDIS_PASSWORD=1q2w3e4r
@@ -44,6 +49,8 @@ services:
     labels:
       - "name=redis"
       - "mode=standalone"
+    expose:
+      - 6379
     networks:
       - net_random_dice
 
@@ -55,6 +62,6 @@ volumes:
   vol_accout_db:
     driver: local
     driver_opts:
-      device: ./data
+      device: ${HOME}/var/data/account_db
       o: bind
       type: none

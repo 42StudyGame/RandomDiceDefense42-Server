@@ -6,6 +6,7 @@ WEB_BUILD_DIR=WebServerBuild
 
 ALL : up
 up :
+	-mkdir -p ~/var/data/account_db
 	docker compose -f $(DB_DIR)/docker-compose.yml up --build --force-recreate -d
 
 web :
